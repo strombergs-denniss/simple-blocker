@@ -1,0 +1,20 @@
+{
+    "name": "Simple Blocker",
+    "manifest_version": 3,
+    "version": "1.0",
+    "description": "Blocks some websites.",
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "tabs",
+        "webNavigation"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": [
+        "http://*/",
+        "https://*/"
+    ]
+}

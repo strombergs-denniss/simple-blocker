@@ -2,14 +2,14 @@ const ALLOWED = [
     'youtube\\.com/c/',
     'youtube\\.com/(watch|channel|user|playlist|results|account)',
     'youtube\\.com/feed/(channels|library|history)',
-    'twitter\\.com/.+'
+    'twitter\\.com/(?!home|explore)'
 ]
 
 const DENIED = [
     'youtube\\.com',
     'twitter\\.com',
-    'twitter\\.com/home',
     'twitch\\.tv',
+    'nitter\\.net'
 ]
 
 const Filter = {
@@ -17,12 +17,12 @@ const Filter = {
         if (url.includes('youtube.com')) {
             window.location.pathname = '/results'
         } else {
-            document.body.innerHTML = ''
+            document.body.innerHTML = '<div style="font-size: 72px; height: 100vh; display: flex; justify-content: center; align-items: center;">STOP WASTING TIME DUMBASS!</div>'
         }
     },
     blockTabElements: function(url) {
-        if (url.includes('youtube.com/watch')) {
-            const elements = document.querySelectorAll('#columns #secondary #related, ytd-topbar-logo-renderer, ytd-notification-topbar-button-renderer')
+        if (url.includes('youtube.com')) {
+            const elements = document.querySelectorAll('#columns #secondary #related, ytd-topbar-logo-renderer, ytd-notification-topbar-button-renderer, ytd-mini-guide-renderer')
 
             for (const element of elements) {
                 element.innerHTML = ''
@@ -36,14 +36,6 @@ const Filter = {
                 if (navButton) {
                     navButton.innerHTML = ''
                 }
-            }
-        }
-
-        if (url.includes('youtube.com')) {
-            const elements = document.querySelectorAll('ytd-mini-guide-renderer')
-
-            for (const element of elements) {
-                element.innerHTML = ''
             }
         }
     },

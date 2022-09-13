@@ -1,28 +1,48 @@
 const ALLOWED = [
     'youtube\\.com/c/',
-    'youtube\\.com/(watch|channel|user|playlist|results|account|shorts)',
+    'youtube\\.com/(watch|channel|user|playlist|results|account)',
     'youtube\\.com/feed/(channels|library|history)',
-    'twitch\\.tv/.+',
-    'google\\.com',
     'twitter\\.com/.+'
 ]
 
 const DENIED = [
     'youtube\\.com',
     'twitter\\.com',
-    'twitter\\.com',
-    'twitch\\.tv'
+    'twitter\\.com/home',
+    'twitch\\.tv',
 ]
 
 const Filter = {
-    blockTab: function() {
-        document.body.innerHTML = ''
+    blockTab: function(url) {
+        if (url.includes('youtube.com')) {
+            window.location.pathname = '/results'
+        } else {
+            document.body.innerHTML = ''
+        }
     },
     blockTabElements: function(url) {
         if (url.includes('youtube.com/watch')) {
-            const element = document.querySelector('#columns #secondary #related')
+            const elements = document.querySelectorAll('#columns #secondary #related, ytd-topbar-logo-renderer, ytd-notification-topbar-button-renderer')
 
-            if (element) {
+            for (const element of elements) {
+                element.innerHTML = ''
+            }
+
+            const navButtons = document.querySelectorAll('ytd-guide-section-renderer:first-child .style-scope.ytd-guide-section-renderer#items ytd-guide-entry-renderer')
+
+            for (let a = 0; a < 4; ++a) {
+                const navButton = navButtons[a]
+
+                if (navButton) {
+                    navButton.innerHTML = ''
+                }
+            }
+        }
+
+        if (url.includes('youtube.com')) {
+            const elements = document.querySelectorAll('ytd-mini-guide-renderer')
+
+            for (const element of elements) {
                 element.innerHTML = ''
             }
         }

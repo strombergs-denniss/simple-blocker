@@ -23,7 +23,7 @@ const Filter = {
     },
     blockTabElements: function(url) {
         if (url.includes('youtube.com')) {
-            const elements = document.querySelectorAll('#columns #secondary #related, ytd-topbar-logo-renderer, ytd-notification-topbar-button-renderer, ytd-mini-guide-renderer')
+            const elements = document.querySelectorAll('#columns #secondary #related, ytd-topbar-logo-renderer, ytd-notification-topbar-button-renderer, ytd-mini-guide-renderer, #owner #subscribe-button')
 
             for (const element of elements) {
                 element.innerHTML = ''

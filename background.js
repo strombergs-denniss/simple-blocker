@@ -15,6 +15,7 @@ const DENIED = [
 const Filter = {
     blockTab: function(url) {
         if (url.includes('youtube.com')) {
+            document.body.innerHTML = ''
             window.location.pathname = '/results'
         } else {
             document.body.innerHTML = '<div style="font-size: 72px; height: 100vh; display: flex; justify-content: center; align-items: center;">STOP WASTING TIME DUMBASS!</div>'

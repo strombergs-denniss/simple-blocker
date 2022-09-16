@@ -95,12 +95,18 @@ function formatTime(ms) {
 
     const hours = date.getUTCHours()
     const minutes = date.getUTCMinutes()
-    // const seconds = date.getUTCSeconds()
+    const seconds = date.getUTCSeconds()
+
+    if (!hours && !minutes) {
+        return `${ seconds }`
+    }
 
     return `${ hours }:${ minutes }`
 }
 
 function reset(state) {
+    state.tabId = null
+    state.url = ''
     state.key = ''
     state.limit = 0
     state.time = 0
@@ -117,11 +123,17 @@ async function updateTime(key, time) {
 function interval() {
     STATE.time += INTERVAL
 
-    if (STATE.time > STATE.limit) {
+    if (STATE.time >= STATE.limit) {
         clearInterval(STATE.timer)
+        chrome.scripting.executeScript({
+            target: { tabId: STATE.tabId },
+            function: blockPage,
+            args: [STATE.url]
+        })
+        chrome.action.setBadgeText({ text: '' });
+    } else {
+        chrome.action.setBadgeText({ text: formatTime(STATE.limit - STATE.time) });
     }
-
-    chrome.action.setBadgeText({ text: formatTime(STATE.limit - STATE.time) });
 }
 
 function blockWebsite(tab) {
@@ -136,19 +148,22 @@ function blockWebsite(tab) {
                 if (website.isTimeLimitEnabled) {
                     if (!STATE.timer) {
                         STATE.key = key
+                        STATE.tabId = tab.id
+                        STATE.url = tab.url
 
                         chrome.storage.local.get(key, data => {
                             const value = data[key] || 0
                             STATE.time = value
                             STATE.limit = website.defaultTimeLimit
-                            STATE.timer = setInterval(interval, INTERVAL);
 
-                            if (STATE.time > STATE.limit) {
+                            if (STATE.time >= STATE.limit) {
                                 chrome.scripting.executeScript({
                                     target: { tabId: tab.id },
                                     function: blockPage,
                                     args: [tab.url]
                                 })
+                            } else {
+                                STATE.timer = setInterval(interval, INTERVAL);
                             }
                         })
                     }

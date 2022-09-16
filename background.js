@@ -9,7 +9,8 @@ const DENIED = [
     'youtube\\.com',
     'twitter\\.com',
     'twitch\\.tv',
-    'nitter\\.net'
+    'nitter\\.net',
+    'tiktok\\.com'
 ]
 
 const Filter = {

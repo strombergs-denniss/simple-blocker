@@ -16,5 +16,6 @@
     "host_permissions": [
         "http://*/",
         "https://*/"
-    ]
+    ],
+    "action": {}
 }

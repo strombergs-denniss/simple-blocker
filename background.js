@@ -5,6 +5,7 @@ function mToMs(m) {
 const DENIED = false
 const ALLOWED = true
 const INTERVAL = 1000 / 10
+const INTERVAL_MULTIPLIER = 1 // Mostly for testing
 const STATE = {}
 
 const WEBSITES = {
@@ -120,14 +121,9 @@ async function resetLimits(force = false) {
     const today = new Date().getUTCDay()
 
     if (value != today || force) {
-        console.log('test')
-
         for (const a in WEBSITES) {
             if (WEBSITES[a].isTimeLimitEnabled) {
-                console.log({ [a]: 0 })
-
                 await chrome.storage.local.set({ [a]: 0 })
-                console.log('cleaning')
             }
         }
 
@@ -144,7 +140,7 @@ async function updateTime(key, time) {
 }
 
 function interval() {
-    STATE.time += INTERVAL
+    STATE.time += INTERVAL * INTERVAL_MULTIPLIER
 
     if (STATE.time >= STATE.limit) {
         clearInterval(STATE.timer)

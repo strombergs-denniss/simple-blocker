@@ -4,7 +4,7 @@ function mToMs(m) {
 
 const DENIED = false
 const ALLOWED = true
-const INTERVAL = 1000
+const INTERVAL = 1000 / 10
 const STATE = {}
 
 const WEBSITES = {
@@ -42,8 +42,8 @@ const WEBSITES = {
             '/(?!home|explore)'
         ],
         denied: [],
-        isTimeLimitEnabled: false,
-        defaultTimeLimit: 0,
+        isTimeLimitEnabled: true,
+        defaultTimeLimit: mToMs(30),
         elementBlocker: url => {}
     },
     'twitch\\.tv': {
@@ -113,6 +113,29 @@ function reset(state) {
     state.timer = null
 }
 
+async function resetLimits(force = false) {
+    const key = 'LAST_DAY'
+    const data = await chrome.storage.local.get(key)
+    const value = data[key] || 0
+    const today = new Date().getUTCDay()
+
+    if (value != today || force) {
+        console.log('test')
+
+        for (const a in WEBSITES) {
+            if (WEBSITES[a].isTimeLimitEnabled) {
+                console.log({ [a]: 0 })
+
+                await chrome.storage.local.set({ [a]: 0 })
+                console.log('cleaning')
+            }
+        }
+
+        data[key] = today
+        await chrome.storage.local.set(data)
+    }
+}
+
 async function updateTime(key, time) {
     const data = await chrome.storage.local.get(key)
     const value = data[key] || 0
@@ -136,6 +159,14 @@ function interval() {
     }
 }
 
+function blockPageScript(tab) {
+    chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        function: blockPage,
+        args: [tab.url]
+    })
+}
+
 function blockWebsite(tab) {
     for (const key in WEBSITES) {
         if (new RegExp(key).test(tab.url)) {
@@ -157,24 +188,38 @@ function blockWebsite(tab) {
                             STATE.limit = website.defaultTimeLimit
 
                             if (STATE.time >= STATE.limit) {
-                                chrome.scripting.executeScript({
-                                    target: { tabId: tab.id },
-                                    function: blockPage,
-                                    args: [tab.url]
-                                })
+                                blockPageScript(tab)
                             } else {
                                 STATE.timer = setInterval(interval, INTERVAL);
                             }
                         })
                     }
                 } else {
-                    chrome.scripting.executeScript({
-                        target: { tabId: tab.id },
-                        function: blockPage,
-                        args: [tab.url]
-                    })
+                    blockPageScript(tab)
                 }
             } else {
+                if (website.isTimeLimitEnabled) {
+                    if (!STATE.timer) {
+                        STATE.key = key
+                        STATE.tabId = tab.id
+                        STATE.url = tab.url
+
+                        chrome.storage.local.get(key, data => {
+                            const value = data[key] || 0
+                            STATE.time = value
+                            STATE.limit = website.defaultTimeLimit
+
+                            if (STATE.time >= STATE.limit) {
+                                blockPageScript(tab)
+
+                                return
+                            } else {
+                                STATE.timer = setInterval(interval, INTERVAL);
+                            }
+                        })
+                    }
+                }
+
                 chrome.scripting.executeScript({
                     target: { tabId: tab.id },
                     function: website.elementBlocker,
@@ -188,6 +233,8 @@ function blockWebsite(tab) {
 }
 
 function onActivated(activeInfo) {
+    resetLimits()
+
     if (STATE.timer) {
         clearInterval(STATE.timer)
         updateTime(STATE.key, STATE.time)

@@ -44,7 +44,7 @@ const WEBSITES = {
         ],
         denied: [],
         isTimeLimitEnabled: true,
-        defaultTimeLimit: mToMs(30),
+        defaultTimeLimit: mToMs(60),
         elementBlocker: url => {}
     },
     'twitch\\.tv': {
@@ -67,8 +67,8 @@ const WEBSITES = {
         access: DENIED,
         allowed: [],
         denied: [],
-        isTimeLimitEnabled: true,
-        defaultTimeLimit: mToMs(30),
+        isTimeLimitEnabled: false,
+        defaultTimeLimit: 0,
         elementBlocker: url => {}
     },
     'reddit\\.com': {
@@ -76,7 +76,7 @@ const WEBSITES = {
         allowed: [],
         denied: [],
         isTimeLimitEnabled: true,
-        defaultTimeLimit: mToMs(60),
+        defaultTimeLimit: mToMs(30),
         elementBlocker: url => {}
     }
 }

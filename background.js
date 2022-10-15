@@ -39,16 +39,14 @@ const WEBSITES = {
     },
     'twitter\\.com': {
         access: DENIED,
-        allowed: [
-            '/(?!home|explore)'
-        ],
+        allowed: [],
         denied: [],
-        isTimeLimitEnabled: true,
-        defaultTimeLimit: mToMs(60),
+        isTimeLimitEnabled: false,
+        defaultTimeLimit: 0,
         elementBlocker: url => {}
     },
     'twitch\\.tv': {
-        access: DENIED,
+        access: ALLOWED,
         allowed: [],
         denied: [],
         isTimeLimitEnabled: false,
@@ -64,7 +62,7 @@ const WEBSITES = {
         elementBlocker: url => {}
     },
     'nitter\\.net': {
-        access: DENIED,
+        access: ALLOWED,
         allowed: [],
         denied: [],
         isTimeLimitEnabled: false,

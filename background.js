@@ -13,13 +13,13 @@ const WEBSITES = {
         access: DENIED,
         allowed: [
             '/c/',
-            '/(watch|channel|user|playlist|results|account)',
+            '/(watch|channel|user|playlist|results|account|@)',
             '/feed/(channels|library|history)'
         ],
         denied: [],
         isTimeLimitEnabled: false,
         defaultTimeLimit: 0,
-        elementBlocker: url => {
+        elementBlocker: () => {
             const elements = document.querySelectorAll('#columns #secondary #related, ytd-topbar-logo-renderer, ytd-notification-topbar-button-renderer, ytd-mini-guide-renderer, #owner #subscribe-button')
 
             for (const element of elements) {
@@ -46,7 +46,7 @@ const WEBSITES = {
         elementBlocker: url => {}
     },
     'twitch\\.tv': {
-        access: ALLOWED,
+        access: DENIED,
         allowed: [],
         denied: [],
         isTimeLimitEnabled: false,
@@ -62,7 +62,7 @@ const WEBSITES = {
         elementBlocker: url => {}
     },
     'nitter\\.net': {
-        access: ALLOWED,
+        access: DENIED,
         allowed: [],
         denied: [],
         isTimeLimitEnabled: false,
@@ -73,8 +73,24 @@ const WEBSITES = {
         access: DENIED,
         allowed: [],
         denied: [],
-        isTimeLimitEnabled: true,
-        defaultTimeLimit: mToMs(30),
+        isTimeLimitEnabled: false,
+        defaultTimeLimit: 0,
+        elementBlocker: url => {}
+    },
+    'instagram\\.com': {
+        access: DENIED,
+        allowed: [],
+        denied: [],
+        isTimeLimitEnabled: false,
+        defaultTimeLimit: 0,
+        elementBlocker: url => {}
+    },
+    'jstris\\.jezevec10\\.com': {
+        access: DENIED,
+        allowed: [],
+        denied: [],
+        isTimeLimitEnabled: false,
+        defaultTimeLimit: 0,
         elementBlocker: url => {}
     }
 }

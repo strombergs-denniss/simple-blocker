@@ -39,10 +39,15 @@ const WEBSITES = {
     },
     'twitter\\.com': {
         access: DENIED,
-        allowed: [],
-        denied: [],
-        isTimeLimitEnabled: false,
-        defaultTimeLimit: 0,
+        allowed: [
+            '/[a-zA-Z0-9_-]+',
+        ],
+        denied: [
+            '/explore'
+        ],
+        isTimeLimitEnabled: true,
+        timeLimitScope: ALLOWED,
+        defaultTimeLimit: mToMs(10),
         elementBlocker: url => {}
     },
     'twitch\\.tv': {
@@ -73,8 +78,9 @@ const WEBSITES = {
         access: DENIED,
         allowed: [],
         denied: [],
-        isTimeLimitEnabled: false,
-        defaultTimeLimit: 0,
+        isTimeLimitEnabled: true,
+        timeLimitScope: DENIED,
+        defaultTimeLimit: mToMs(10),
         elementBlocker: url => {}
     },
     'instagram\\.com': {
@@ -180,57 +186,48 @@ function blockPageScript(tab) {
     })
 }
 
+function processTimer(tab, key, website) {
+    if (!STATE.timer) {
+        STATE.key = key
+        STATE.tabId = tab.id
+        STATE.url = tab.url
+
+        chrome.storage.local.get(key, data => {
+            const value = data[key] || 0
+            STATE.time = value
+            STATE.limit = website.defaultTimeLimit
+
+            if (STATE.time >= STATE.limit) {
+                blockPageScript(tab)
+            } else {
+                STATE.timer = setInterval(interval, INTERVAL);
+            }
+        })
+    }
+}
+
+function isDeniedDenied(tab, key, website) {
+    return website.access === DENIED && !website.allowed.some(a => new RegExp(key + a).test(tab.url))
+}
+
+function isAllowedDenied(tab, key, website) {
+    return website.access === ALLOWED && website.denied.some(a => new RegExp(key + a).test(tab.url))
+}
+
 function blockWebsite(tab) {
     for (const key in WEBSITES) {
         if (new RegExp(key).test(tab.url)) {
             const website = WEBSITES[key]
 
-            if (
-                (website.access === DENIED && !website.allowed.some(a => new RegExp(key + a).test(tab.url))) ||
-                (website.access === ALLOWED && website.denied.some(a => new RegExp(key + a).test(tab.url)))
-            ) {
-                if (website.isTimeLimitEnabled) {
-                    if (!STATE.timer) {
-                        STATE.key = key
-                        STATE.tabId = tab.id
-                        STATE.url = tab.url
-
-                        chrome.storage.local.get(key, data => {
-                            const value = data[key] || 0
-                            STATE.time = value
-                            STATE.limit = website.defaultTimeLimit
-
-                            if (STATE.time >= STATE.limit) {
-                                blockPageScript(tab)
-                            } else {
-                                STATE.timer = setInterval(interval, INTERVAL);
-                            }
-                        })
-                    }
+            if (isDeniedDenied(tab, key, website) || isAllowedDenied(tab, key, website)) {
+                if (website.isTimeLimitEnabled && website.timeLimitScope === DENIED) {
+                    processTimer(tab, key, website)
                 } else {
                     blockPageScript(tab)
                 }
             } else {
-                if (website.isTimeLimitEnabled) {
-                    if (!STATE.timer) {
-                        STATE.key = key
-                        STATE.tabId = tab.id
-                        STATE.url = tab.url
-
-                        chrome.storage.local.get(key, data => {
-                            const value = data[key] || 0
-                            STATE.time = value
-                            STATE.limit = website.defaultTimeLimit
-
-                            if (STATE.time >= STATE.limit) {
-                                blockPageScript(tab)
-
-                                return
-                            } else {
-                                STATE.timer = setInterval(interval, INTERVAL);
-                            }
-                        })
-                    }
+                if (website.isTimeLimitEnabled && website.timeLimitScope === ALLOWED) {
+                    processTimer(tab, key, website)
                 }
 
                 chrome.scripting.executeScript({
@@ -285,7 +282,6 @@ chrome.tabs.onActivated.addListener(onActivated)
 chrome.webNavigation.onCommitted.addListener(onCommitted)
 
 chrome.tabs.onUpdated.addListener(onUpdated)
-
 
 // For keeping service worker alive, need to refactor code
 

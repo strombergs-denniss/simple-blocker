@@ -1,0 +1,11 @@
+{
+    "BrowserGuestModeEnabled": false,
+    "ExtensionInstallForcelist": [
+        "bjmpamdaahnfjemohbaikcobaeadiccf",
+        "gighmmpiobklfepjocnamgkkbiglidom",
+        "eiimnmioipafcokbfikbljfdeojpcgbh"
+    ],
+    "IncognitoModeAvailability": 1,
+    "ProfilePickerOnStartupAvailability": 1,
+    "BrowserAddPersonEnabled": false
+}

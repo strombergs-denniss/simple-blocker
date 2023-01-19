@@ -47,8 +47,14 @@ const WEBSITES = {
         ],
         isTimeLimitEnabled: true,
         timeLimitScope: ALLOWED,
-        defaultTimeLimit: mToMs(10),
-        elementBlocker: url => {}
+        defaultTimeLimit: mToMs(20),
+        elementBlocker: () => {
+            const element = document.querySelector('[data-testid="sidebarColumn"]')
+
+            if (element) {
+                element.innerHTML = ''
+            }
+        }
     },
     'twitch\\.tv': {
         access: DENIED,

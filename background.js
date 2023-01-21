@@ -47,7 +47,7 @@ const WEBSITES = {
         ],
         isTimeLimitEnabled: true,
         timeLimitScope: ALLOWED,
-        defaultTimeLimit: mToMs(20),
+        defaultTimeLimit: mToMs(60),
         elementBlocker: () => {
             const element = document.querySelector('[data-testid="sidebarColumn"]')
 
